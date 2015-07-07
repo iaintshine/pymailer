@@ -1,0 +1,7 @@
+mandrill:
+  api_key: "MANDRILL_KEY"
+website:
+  domain: "domain.com"
+recipient:
+  name: "John Doe"
+  email: "john.doe@domain.com"
