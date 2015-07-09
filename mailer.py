@@ -4,6 +4,7 @@ from yaml import load
 import flask
 from flask import request
 import mandrill
+import logging
 
 app = flask.Flask(__name__)
 
@@ -28,9 +29,9 @@ class Config:
     def load(self):
         if not self._config:
             if not os.path.isfile(self.config_path):
-                raise Exception('config.yml file could not be found at'
-                                'path: ' + self.app_home)
-
+                message = 'config.yml file could not be found at path: ' + self.app_home
+                logging.error(message)
+                raise Exception(message)
             with open(self.config_path) as f:
                 self._config = load(f.read())
         return self
@@ -108,7 +109,7 @@ class Mail:
         try:
             result = self.mandrill_client.messages.send(message=self.message,
                                                         async=True)
-            print result
+            logging.info(result)
             return {
                 'status': result[0]['status'],
                 'id': result[0].get('_id', None)
