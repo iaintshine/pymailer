@@ -8,21 +8,52 @@ import mandrill
 app = flask.Flask(__name__)
 
 
-class Mail:
-    def __init__(self, params):
-        self.params = params
+class Config:
+    DEFAULT_PATH = '/etc/pymailer/'
+
+    def __init__(self):
         self._config = None
 
     @property
-    def config_file(self):
-        return os.path.join(os.environ['MAILER_HOME'], 'config.yml')
+    def app_home(self):
+        path = os.environ.get('PYMAILER_HOME')
+        if path is None:
+            path = self.DEFAULT_PATH
+        return path
 
     @property
-    def config(self):
+    def config_path(self):
+        return os.path.join(self.app_home, 'config.yml')
+
+    def load(self):
         if not self._config:
-            with open(self.config_file) as f:
+            if not os.path.isfile(self.config_path):
+                raise Exception('config.yml file could not be found at'
+                                'path: ' + self.app_home)
+
+            with open(self.config_path) as f:
                 self._config = load(f.read())
+        return self
+
+    @property
+    def dict(self):
         return self._config
+
+
+class PyMailer:
+    __global_config = None
+
+    @classmethod
+    def config(cls):
+        if cls.__global_config is None:
+            cls.__global_config = Config().load().dict
+        return cls.__global_config
+
+
+class Mail:
+    def __init__(self, params):
+        self.params = params
+        self.config = PyMailer.config()
 
     @property
     def mandrill_client(self):
