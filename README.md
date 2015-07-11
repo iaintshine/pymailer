@@ -12,16 +12,13 @@ Mandrill account. See config.yml.sample
 
 ## Docker 
 
-`PYMAILER_HOME` is set by default to `/etc/pymailer/` so you should mount volume with a configuration file to `/etc/pymailer` - see below, to run container in interactive mode.
+`PYMAILER_HOME` is set by default to `/etc/pymailer/` so you should mount volume with a configuration file to `/etc/pymailer`.
+
+To download (pull) and run the container:
 
 ```bash
-$ docker run -it -v $(pwd):/etc/pymailer:ro -p 127.0.0.1:9000:5000 pymailer
-```
-
-And to build the container:
-
-```bash
-$ docker build -t pymailer .
+$ docker pull iaintshine/pymailer
+$ docker run -d --log-driver=syslog --restart=always -v /etc/pymailer:/etc/pymailer:ro -p 127.0.0.1:9000:5000 iaintshine/pymailer
 ```
 
 ## Development
@@ -34,4 +31,16 @@ or using gunicorn
 
 ```bash
 $ PYMAILER_HOME=$(pwd) gunicorn -b 127.0.0.1:5000 mailer:app
+```
+
+To build the container:
+
+```bash
+$ docker build -t pymailer .
+```
+
+To run container in interactive mode:
+
+```bash
+$ docker run -it -v $(pwd):/etc/pymailer:ro -p 127.0.0.1:9000:5000 pymailer
 ```
